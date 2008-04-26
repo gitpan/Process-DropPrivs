@@ -1,0 +1,105 @@
+NAME
+    Process::DropPrivs - carefully drop root privileges
+
+SYNOPSIS
+            use Process::DropPrivs;
+
+            if ( $> != 0 ) {
+                    die "Run this as root!\n";
+            }
+        
+            # do something with root privileges
+
+            drop_privs('nobody');
+
+            # do stuff without root privileges
+
+DESCRIPTION
+    Dropping privileges is something that needs to be done right and can
+    easily be done wrong. Even if you know how to do it right, it takes a
+    lot of booring code.
+
+USAGE
+    drop_privs(*new_user*, [*primary_group*] , [*supplimental_group* ... ]);
+
+    This is the only function provided by Process::DropPrivs. It is exported
+    by default.
+
+    drop_privs() switches the uid, euid, gid, egid and reduces the
+    supplimental groups to those specified if any.
+
+    *new_user* is the user name or numeric user id of the user whom you wish
+    the process to run as.
+
+    *primary_group* is the group name or numeric group id of the primary
+    group. If undefined, the primary group of the user *new_user* is used.
+
+    *supplimental_group* is any group which you'd like the process to be a
+    member of. If undefined, all supplimental group memberships are dropped.
+
+    All names and groups are assumed to be numeric uids and numeric gids if
+    they are integers. Otherwize they are assumed to be user names or group
+    names.
+
+EXAMPLES
+    *   drop_privs('jdoe');
+
+        Switch the uid and euid to 'jdoe'. Switch the gid and egid to jdoe's
+        primary group (probably 'jdoe' or 'users' but maybe not.) Drop
+        membership in any other groups.
+
+    *   drop_privs('jdoe','users,'tape');
+
+        Switch the uid and euid to 'jdoe'. Switch the gid and egid to
+        'users'. Add membership in the 'tape' group and drop membership in
+        any other groups.
+
+    *   drop_privs('jdoe',undef,'tape');
+
+        Switch the uid and euid to 'jdoe'. Switch the gid and egid to jdoe's
+        primary group (probably 'jdoe' or 'users' but maybe not.) Add
+        membership in the 'tape' group and drop membership in any other
+        groups.
+
+DIAGNOSTICS
+    drop_privs() returns undef on succss and croaks on failure.
+
+DISCUSSION
+    I've written code that drops privileges many times and here's some of
+    things I've forgotten to do at one time or another. Hence this module.
+
+    Make sure you drop group membership as well as changing user id.
+    Handle supplimental groups as well as the users primary group.
+    Check to make sure uids/gids really did change.
+    Check group membership without getting hung up about the order the
+    groups are listed in.
+BUGS AND LIMITATIONS
+    This has only been tested on Linux.
+
+    I assume you want euid == uid and egid == gid. If you don't I'd love to
+    know why.
+
+    Please report any bugs or feature requests to
+    `bug-process-dropprivs@rt.cpan.org', or through the web interface at
+    http://rt.cpan.org.
+
+AUTHOR
+    Dylan Martin `<dmartin@cpan.org>'
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2008, Dylan Martin & Seattle Central Community College
+    `<dmartin@cpan.org>'.
+
+    Permission to use, copy, modify, and distribute this software for any
+    purpose with or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
+
+DISCLAIMER
+    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
